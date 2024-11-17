@@ -87,6 +87,7 @@ with st.sidebar.expander("Option 2: Upload a CSV file"):
     st.write(default_df.head())
 
 # Process uploaded file data 
+#Used Chatgpt for syntax because I kept getting an error saying that the hour and day_of_week columns didn't match up
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
 
@@ -94,7 +95,7 @@ if uploaded_file is not None:
     if 'weekday' in df.columns:
         df = df.drop('weekday', axis=1)
 
-    # categorical features
+    # categorical features 
     categorical_features = ['holiday', 'weather_main', 'month', 'day_of_week']
     for feature in categorical_features:
         if feature in df.columns:
