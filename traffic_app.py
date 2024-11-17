@@ -11,7 +11,7 @@ st.title('Traffic Volume Predictor')
 st.write("This app predicts traffic volume based on weather and time-related features.")
 st.image('traffic_image.gif', use_column_width=True)
 
-# Load the model and dataset with caching
+# Load the model and dataset
 
 with open('traffic.pickle', 'rb') as model_pickle:
     reg_model = pickle.load(model_pickle)
@@ -90,37 +90,37 @@ with st.sidebar.expander("Option 2: Upload a CSV file"):
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
 
-    # Drop the 'weekday' column if it exists
+    # Drop the 'weekday' column
     if 'weekday' in df.columns:
         df = df.drop('weekday', axis=1)
 
-    # Ensure all categorical features (except 'hour') are treated as strings
+    # categorical features
     categorical_features = ['holiday', 'weather_main', 'month', 'day_of_week']
     for feature in categorical_features:
         if feature in df.columns:
             df[feature] = df[feature].astype(str)
 
-    # Convert 'hour' to string for one-hot encoding
+    # hour type
     if 'hour' in df.columns:
         df['hour'] = df['hour'].astype(object)
 
-    # Concatenate the uploaded DataFrame with the sample DataFrame (default_df)
+    # Concat the uploaded DataFrame with the sample DataFrame
     combined_df = pd.concat([default_df, df], ignore_index=True)
 
-    # One-hot encode the entire DataFrame, including 'hour'
+    # One-hot encode the entire DataFrame
     encoded_combined_df = pd.get_dummies(combined_df, columns=categorical_features + ['hour'])
 
     # Drop any duplicate columns
     encoded_combined_df = encoded_combined_df.loc[:, ~encoded_combined_df.columns.duplicated()]
 
-    # Infer the feature names from the sample encoded DataFrame (default_df)
+    # Feature names from the sample encoded DataFrame
     sample_encoded = pd.get_dummies(default_df, columns=categorical_features + ['hour'])
     model_features = sample_encoded.columns.to_list()
 
-    # Reindex the combined DataFrame to match the model's expected features
+    # Combine DataFrame to match the model's expected features
     encoded_combined_df = encoded_combined_df.reindex(columns=model_features, fill_value=0)
 
-    # Extract only the user's data (the tail of the combined DataFrame)
+    # Extract only the user's data
     user_encoded = encoded_combined_df.tail(len(df))
 
     # Make predictions
